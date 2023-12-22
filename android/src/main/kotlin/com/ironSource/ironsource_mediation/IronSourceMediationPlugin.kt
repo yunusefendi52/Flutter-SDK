@@ -40,9 +40,9 @@ class IronSourceMediationPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
   ///
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel: MethodChannel
+  private var channel: MethodChannel? = null
   private var activity: Activity? = null
-  private lateinit var context: Context
+  private var context: Context? = null
 
 
   // Banner related
@@ -67,7 +67,7 @@ class IronSourceMediationPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     if (!isPluginAttached) {
       channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ironsource_mediation")
-      channel.setMethodCallHandler(this)
+      channel?.setMethodCallHandler(this)
       context=flutterPluginBinding.getApplicationContext()
       initListeners()
     }
@@ -75,7 +75,7 @@ class IronSourceMediationPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     isPluginAttached=false
-    channel.setMethodCallHandler(null)
+    channel?.setMethodCallHandler(null)
     detachListeners()
   }
 
@@ -83,51 +83,56 @@ class IronSourceMediationPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
    * Instantiate and set listeners
    */
   private fun initListeners() {
-    // RewardedVideo
-    if (mRewardedVideoListener == null) {
-      mRewardedVideoListener = RewardedVideoListener(channel)
-      IronSource.setRewardedVideoListener(mRewardedVideoListener)
-    }
-    // Interstitial
-    if (mInterstitialListener == null) {
-      mInterstitialListener = InterstitialListener(channel)
-      IronSource.setInterstitialListener(mInterstitialListener)
-    }
-    // OfferWall
-    if (mOfferWallListener == null) {
-      mOfferWallListener = OfferWallListener(channel)
-      IronSource.setOfferwallListener(mOfferWallListener)
-    }
-    // Banner
-    if (mBannerListener == null) {
-      mBannerListener = BannerListener(channel, ::onBannerAdLoadFailed)
-    }
-    // ImpressionData Listener
-    if (mImpressionDataListener == null) {
-      mImpressionDataListener = ImpressionDataListener(channel)
-      IronSource.addImpressionDataListener(mImpressionDataListener!!)
-    }
-    // Initialization Listener
-    if (mInitializationListener == null) {
-      mInitializationListener = InitializationListener(channel)
-    }
-    // LevelPlay RewardedVideo
-    if (mLevelPlayRewardedVideoListener == null) {
-      mLevelPlayRewardedVideoListener = LevelPlayRewardedVideoListener(channel)
-      IronSource.setLevelPlayRewardedVideoListener(mLevelPlayRewardedVideoListener)
-    }
-    // LevelPlay Interstitial
-    if (mLevelPlayInterstitialListener == null) {
-      mLevelPlayInterstitialListener = LevelPlayInterstitialListener(channel)
-      IronSource.setLevelPlayInterstitialListener(mLevelPlayInterstitialListener)
-    }
-    // LevelPlay Banner
-    if (mLevelPlayBannerListener == null) {
-      mLevelPlayBannerListener = LevelPlayBannerListener(channel)
-    }
+    var channel = this.channel
+    if (channel != null) {
+      // RewardedVideo
+      if (mRewardedVideoListener == null) {
+        mRewardedVideoListener = RewardedVideoListener(channel)
+        IronSource.setRewardedVideoListener(mRewardedVideoListener)
+      }
+      // Interstitial
+      if (mInterstitialListener == null) {
+        mInterstitialListener = InterstitialListener(channel)
+        IronSource.setInterstitialListener(mInterstitialListener)
+      }
+      // OfferWall
+      if (mOfferWallListener == null) {
+        mOfferWallListener = OfferWallListener(channel)
+        IronSource.setOfferwallListener(mOfferWallListener)
+      }
+      // Banner
+      if (mBannerListener == null) {
+        mBannerListener = BannerListener(channel, ::onBannerAdLoadFailed)
+      }
+      // ImpressionData Listener
+      if (mImpressionDataListener == null) {
+        mImpressionDataListener = ImpressionDataListener(channel)
+        IronSource.addImpressionDataListener(mImpressionDataListener!!)
+      }
+      // Initialization Listener
+      if (mInitializationListener == null) {
+        mInitializationListener = InitializationListener(channel)
+      }
+      // LevelPlay RewardedVideo
+      if (mLevelPlayRewardedVideoListener == null) {
+        mLevelPlayRewardedVideoListener = LevelPlayRewardedVideoListener(channel)
+        IronSource.setLevelPlayRewardedVideoListener(mLevelPlayRewardedVideoListener)
+      }
+      // LevelPlay Interstitial
+      if (mLevelPlayInterstitialListener == null) {
+        mLevelPlayInterstitialListener = LevelPlayInterstitialListener(channel)
+        IronSource.setLevelPlayInterstitialListener(mLevelPlayInterstitialListener)
+      }
+      // LevelPlay Banner
+      if (mLevelPlayBannerListener == null) {
+        mLevelPlayBannerListener = LevelPlayBannerListener(channel)
+      }
 
-    // Set FlutterActivity
-    setActivityToListeners(activity)
+      // Set FlutterActivity
+      if (activity != null) {
+        setActivityToListeners(activity)
+      }
+    }
   }
 
   /**
@@ -298,7 +303,10 @@ class IronSourceMediationPlugin : FlutterPlugin, MethodCallHandler, ActivityAwar
   }
 
   private fun launchTestSuite( @NonNull result: Result) {
-    IronSource.launchTestSuite(context)
+    var context = context
+    if (context != null) {
+      IronSource.launchTestSuite(context)
+    }
   }
   // endregion
 
